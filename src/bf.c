@@ -77,15 +77,20 @@ int main(int argc, const char** argv) {
                 if(*ptr) stack_push((uintptr_t) pc);
                 else { // otherwise we skip to the end of current loop
                     int closing = 1; // how many nested braces we're in
-                    while(closing) { // might loop forever if no closing brace
+                    while(closing) {
                         pc++;
                         if(*pc == OP_LBR) closing++;
                         if(*pc == OP_RBR) closing--;
+                        if(!*pc) { // exit if we reach the end of code
+                            printf("\nreached eof while searching for ]\n");
+                            exit(-1);
+                        }
                     }
                 }
                 break;
             case OP_RBR: // if val of current cell != 0 return to matching brace
-                if(*ptr) pc = (byte*) stack_peek();
+                // if we reach this op with nothing on stack, skip it
+                if(*ptr && stack_size) pc = (byte*) stack_peek();
                 else stack_pop(); // otherwise remove address from stack
                 break;
         }
@@ -122,7 +127,7 @@ void* xmalloc(size_t size) { // safe malloc exits program if fails
     return p;
 }
 
-void init_stack() {
+void init_stack() { // allocate memory for address stack
     stack_blocks = STACK_BLOCK_SIZE;
     stack_size = 0;
     stack = (uintptr_t*) xmalloc(stack_blocks * sizeof(uintptr_t));
@@ -147,6 +152,7 @@ void* xrealloc(void* p, size_t size) { // safe realloc
 }
 
 uintptr_t stack_peek() { // view top address in stack without removing
+    if(stack_size == 0) return 0;
     return stack[stack_size];
 }
 
