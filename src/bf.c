@@ -121,7 +121,7 @@ int read_file(const char* path) {
 void* xmalloc(size_t size) { // safe malloc exits program if fails
     void* p = malloc(size);
     if(!p) {
-        printf("failed to allocate %u bytes of memory\n", size);
+        printf("failed to allocate %lu bytes of memory\n", size);
         exit(-1);
     }
     return p;
@@ -145,7 +145,7 @@ void stack_push(uintptr_t addr) {
 void* xrealloc(void* p, size_t size) { // safe realloc
     p = realloc(p, size);
     if(!p) {
-        printf("failed to reallocate %u bytes of memory\n", size);
+        printf("failed to reallocate %lu bytes of memory\n", size);
         exit(-1);
     }
     return p;
